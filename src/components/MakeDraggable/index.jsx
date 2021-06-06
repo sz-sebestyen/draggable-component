@@ -33,15 +33,7 @@ function MakeDraggable({
   const divRef = useRef(null);
 
   const updateCoords = (x, y) => {
-    // TODO: prevent from leaving client
-
-    // const correctX = x - xOffset;
-    // const correctY = y - yOffset;
-
-    // const limitX = correctX < 0 ? 0 : correctX;
-
     setPos({ x: x - xOffset, y: y - yOffset });
-
     onMove && onMove(divRef.current, x, y);
   };
 
@@ -54,25 +46,20 @@ function MakeDraggable({
 
       // must specify false so it doesn't trigger on first render
     } else if (isDragged === false) {
-      mouseTracker.unsubscribe(subIdRef.current);
       onEnd && onEnd(divRef.current, pos.x + xOffset, pos.y + yOffset);
     }
-  }, [isDragged]); // eslint-disable-line
-
-  useEffect(() => {
-    window.addEventListener("mouseup", end);
 
     return () => {
-      mouseTracker.unsubscribe(subIdRef.current);
-      window.removeEventListener("mouseup", end);
+      subIdRef.current && mouseTracker.unsubscribe(subIdRef.current);
+      subIdRef.current = null;
     };
-  }, []);
+  }, [isDragged]); // eslint-disable-line
 
   return (
     <div
-      // onDragStart={(event) => event.preventDefault()}
       ref={divRef}
       onMouseDown={start}
+      onMouseUp={end}
       style={{
         ...style,
         cursor: "grab",
