@@ -60,6 +60,7 @@ function MakeDraggable({ children, style = {} }) {
       style={{
         ...style,
         position: "fixed",
+        cursor: "grab",
         ...(isDragged ? { transition: "top 0s, left 0s" } : {}),
       }}
     >
