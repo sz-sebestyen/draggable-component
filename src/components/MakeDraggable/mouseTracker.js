@@ -21,7 +21,7 @@ const mouseTracker = () => {
       Object.assign(subscriptions, { [++id]: callback });
       return id;
     },
-    ussubscribe: (removeId) => delete subscriptions[removeId],
+    unsubscribe: (removeId) => delete subscriptions[removeId],
   };
 };
 

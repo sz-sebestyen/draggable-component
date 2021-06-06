@@ -21,7 +21,7 @@ function MakeDraggable({ children, style = {} }) {
     if (isDragged) {
       subIdRef.current = mouseTracker.subscibe(updateCoords);
     } else {
-      mouseTracker.ussubscribe(subIdRef.current);
+      mouseTracker.unsubscribe(subIdRef.current);
     }
   }, [isDragged]); // eslint-disable-line
 
