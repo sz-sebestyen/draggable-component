@@ -15,12 +15,9 @@ function MakeDraggable({ children, style = {}, ...rest }) {
     setXoffset(mouseTracker.getX() - box.x);
 
     setPos({ x: `${box.x}px`, y: `${box.y}px` });
-    // console.log("setPos in start");
 
     setIsDragged(true);
   };
-
-  // const mainRef = useRef(null);
 
   const end = () => {
     setIsDragged(false);
@@ -58,7 +55,6 @@ function MakeDraggable({ children, style = {}, ...rest }) {
 
   return (
     <div
-      // ref={mainRef}
       // onDragStart={(event) => event.preventDefault()}
       className="makeDraggable"
       onMouseDown={start}
@@ -68,6 +64,7 @@ function MakeDraggable({ children, style = {}, ...rest }) {
         ...(isDragged
           ? {
               position: "fixed",
+              /* TODO: replace transition more carefully (regex) */
               transition: "top 0s, left 0s",
               left: pos.x,
               top: pos.y,
