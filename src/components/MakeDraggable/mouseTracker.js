@@ -3,21 +3,19 @@ const mouseTracker = () => {
   let id = 0;
   const subscriptions = {};
 
-  const updateCoords = (event) => {
+  const move = (event) => {
     x = event.clientX;
     y = event.clientY;
-
-    // console.log("values", Object.values(subscriptions));
 
     Object.values(subscriptions).map((callback) => callback(x, y));
   };
 
-  window.addEventListener("mousemove", updateCoords);
+  window.addEventListener("mousemove", move);
 
   return {
     getX: () => x,
     getY: () => y,
-    subscibe: (callback) => {
+    subscibe(callback) {
       Object.assign(subscriptions, { [++id]: callback });
       return id;
     },

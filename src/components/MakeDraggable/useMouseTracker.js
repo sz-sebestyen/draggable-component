@@ -12,7 +12,6 @@ const useMouseTracker = (shouldSubscribe, callback) => {
     return () => {
       subIdRef.current && mouseTracker.unsubscribe(subIdRef.current);
       subIdRef.current = null;
-      console.log("sik");
     };
   }, [shouldSubscribe, callback]);
 };
