@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./style.css";
-import mouseTracker from "./mouseTracker";
 import useMouseTracker from "./useMouseTracker";
 
 const stopSlowDown = "top 0s, left 0s";
@@ -21,8 +20,8 @@ function MakeDraggable({
 
   const start = (event) => {
     const box = event.target.getBoundingClientRect();
-    setYoffset(mouseTracker.getY() - box.y);
-    setXoffset(mouseTracker.getX() - box.x);
+    setYoffset(event.clientY - box.y);
+    setXoffset(event.clientX - box.x);
 
     setPos({ x: box.x, y: box.y });
 
