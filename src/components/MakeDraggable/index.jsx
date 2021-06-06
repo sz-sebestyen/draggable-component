@@ -61,18 +61,16 @@ function MakeDraggable({
     ? `${style.transition}, ${stopSlowDown}`
     : stopSlowDown;
 
-  const dragStyles = isDragged
-    ? {
-        position: "fixed",
-        transition: transitions,
-        left: `${pos.x}px`,
-        top: `${pos.y}px`,
-      }
-    : {};
+  const dragStyles = {
+    position: "fixed",
+    transition: transitions,
+    left: `${pos.x}px`,
+    top: `${pos.y}px`,
+  };
 
   const styles = {
     ...style,
-    ...dragStyles,
+    ...(isDragged ? dragStyles : {}),
     cursor: "grab",
   };
 
