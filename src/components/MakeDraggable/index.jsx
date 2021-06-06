@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./style.css";
 import mouseTracker from "./mouseTracker";
 import useMouseTracker from "./useMouseTracker";
@@ -35,10 +35,13 @@ function MakeDraggable({
 
   const divRef = useRef(null);
 
-  const move = (x, y) => {
-    setPos({ x: x - xOffset, y: y - yOffset });
-    onMove && onMove(divRef.current, x, y);
-  };
+  const move = useCallback(
+    (x, y) => {
+      setPos({ x: x - xOffset, y: y - yOffset });
+      onMove && onMove(divRef.current, x, y);
+    },
+    [onMove, xOffset, yOffset]
+  );
 
   useMouseTracker(isDragged, move);
 

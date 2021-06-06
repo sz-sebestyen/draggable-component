@@ -12,8 +12,9 @@ const useMouseTracker = (shouldSubscribe, callback) => {
     return () => {
       subIdRef.current && mouseTracker.unsubscribe(subIdRef.current);
       subIdRef.current = null;
+      console.log("sik");
     };
-  }, [shouldSubscribe]); // eslint-disable-line
+  }, [shouldSubscribe, callback]);
 };
 
 export default useMouseTracker;
