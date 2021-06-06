@@ -1,30 +1,24 @@
 const mouseTracker = () => {
-  let x, y;
   let id = 0;
-  const subscriptions = {};
+  let subscriptions = [];
   let isListening = false;
 
-  const move = ({ clientX, clientY }) => {
-    x = clientX;
-    y = clientY;
-
-    Object.values(subscriptions).map((callback) => callback(x, y));
-  };
+  const move = ({ clientX, clientY }) =>
+    subscriptions.map((sub) => sub.callback(clientX, clientY));
 
   return {
-    getX: () => x,
-    getY: () => y,
     subscibe(callback) {
-      Object.assign(subscriptions, { [++id]: callback });
+      subscriptions.push({ id: ++id, callback });
       !isListening && window.addEventListener("mousemove", move);
       isListening = true;
       return id;
     },
     unsubscribe(removeId) {
-      delete subscriptions[removeId];
-      !Object.keys(subscriptions).length &&
+      subscriptions = subscriptions.filter((sub) => removeId !== sub.id);
+      if (!subscriptions.length) {
         window.removeEventListener("mousemove", move);
-      isListening = false;
+        isListening = false;
+      }
     },
   };
 };
