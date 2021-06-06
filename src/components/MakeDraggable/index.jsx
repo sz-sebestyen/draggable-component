@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./style.css";
 import mouseTracker from "./mouseTracker";
 
-function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
-  // TODO: onDragEnd and onDragStart props
-
+function MakeDraggable({
+  onStart,
+  onEnd,
+  onMove,
+  children,
+  style = {},
+  ...rest
+}) {
   const [xOffset, setXoffset] = useState(null);
   const [yOffset, setYoffset] = useState(null);
 
-  const [isDragged, setIsDragged] = useState(false);
+  const [isDragged, setIsDragged] = useState();
   const [pos, setPos] = useState({ x: 0, y: 0 });
 
   const start = (event) => {
@@ -16,7 +21,7 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
     setYoffset(mouseTracker.getY() - box.y);
     setXoffset(mouseTracker.getX() - box.x);
 
-    setPos({ x: `${box.x}px`, y: `${box.y}px` });
+    setPos({ x: box.x, y: box.y });
 
     setIsDragged(true);
   };
@@ -24,6 +29,8 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
   const end = () => {
     setIsDragged(false);
   };
+
+  const divRef = useRef(null);
 
   const updateCoords = (x, y) => {
     // TODO: prevent from leaving client
@@ -33,7 +40,9 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
 
     // const limitX = correctX < 0 ? 0 : correctX;
 
-    setPos({ x: `${x - xOffset}px`, y: `${y - yOffset}px` });
+    setPos({ x: x - xOffset, y: y - yOffset });
+
+    onMove && onMove(divRef.current, x, y);
   };
 
   const subIdRef = useRef(null);
@@ -41,10 +50,12 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
   useEffect(() => {
     if (isDragged) {
       subIdRef.current = mouseTracker.subscibe(updateCoords);
-      onStart && onStart();
-    } else {
+      onStart && onStart(divRef.current, pos.x + xOffset, pos.y + yOffset);
+
+      // must specify false so it doesn't trigger on first render
+    } else if (isDragged === false) {
       mouseTracker.unsubscribe(subIdRef.current);
-      onEnd && onEnd();
+      onEnd && onEnd(divRef.current, pos.x + xOffset, pos.y + yOffset);
     }
   }, [isDragged]); // eslint-disable-line
 
@@ -60,7 +71,7 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
   return (
     <div
       // onDragStart={(event) => event.preventDefault()}
-      className="makeDraggable"
+      ref={divRef}
       onMouseDown={start}
       style={{
         ...style,
@@ -70,8 +81,8 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
               position: "fixed",
               /* TODO: replace transition more carefully (regex) */
               transition: "top 0s, left 0s",
-              left: pos.x,
-              top: pos.y,
+              left: `${pos.x}px`,
+              top: `${pos.y}px`,
             }
           : {}),
       }}
@@ -83,10 +94,3 @@ function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
 }
 
 export default MakeDraggable;
-
-export const WithDraggable = (WrappedComponent) => (props) =>
-  (
-    <MakeDraggable {...props}>
-      <WrappedComponent />
-    </MakeDraggable>
-  );
