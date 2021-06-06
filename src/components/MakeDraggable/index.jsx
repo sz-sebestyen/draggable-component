@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./style.css";
 import mouseTracker from "./mouseTracker";
+import useMouseTracker from "./useMouseTracker";
 
 const stopSlowDown = "top 0s, left 0s";
 
@@ -39,22 +40,16 @@ function MakeDraggable({
     onMove && onMove(divRef.current, x, y);
   };
 
-  const subIdRef = useRef(null);
+  useMouseTracker(isDragged, updateCoords);
 
   useEffect(() => {
     if (isDragged) {
-      subIdRef.current = mouseTracker.subscibe(updateCoords);
       onStart && onStart(divRef.current, pos.x + xOffset, pos.y + yOffset);
 
       // must specify false so it doesn't trigger on first render
     } else if (isDragged === false) {
       onEnd && onEnd(divRef.current, pos.x + xOffset, pos.y + yOffset);
     }
-
-    return () => {
-      subIdRef.current && mouseTracker.unsubscribe(subIdRef.current);
-      subIdRef.current = null;
-    };
   }, [isDragged]); // eslint-disable-line
 
   const transitions = style.transition
