@@ -1,6 +1,8 @@
 import "./App.css";
 import Target from "./components/Target";
-import MakeDraggable from "./components/MakeDraggable";
+import MakeDraggable, { WithDraggable } from "./components/MakeDraggable";
+
+const DraggableTarget = WithDraggable(Target);
 
 function App() {
   // const logDragStart = (div, curX, curY) =>
@@ -12,7 +14,7 @@ function App() {
 
   return (
     <div className="App">
-      <MakeDraggable
+      {/*       <MakeDraggable
         // onStart={logDragStart}
         // onEnd={logDragEnd}
         // onMove={logDragMove}
@@ -24,7 +26,15 @@ function App() {
         }}
       >
         <Target />
-      </MakeDraggable>
+      </MakeDraggable> */}
+      <DraggableTarget
+        style={{
+          position: "absolute",
+          top: "300px",
+          left: "300px",
+          transition: "top 100ms, left 100ms",
+        }}
+      />
     </div>
   );
 }

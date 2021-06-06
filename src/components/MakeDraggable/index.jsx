@@ -82,3 +82,10 @@ function MakeDraggable({
 }
 
 export default MakeDraggable;
+
+export const WithDraggable = (WrappedComponent) => (props) =>
+  (
+    <MakeDraggable {...props}>
+      <WrappedComponent />
+    </MakeDraggable>
+  );
