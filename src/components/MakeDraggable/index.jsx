@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import "./style.css";
 import mouseTracker from "./mouseTracker";
 
+const stopSlowDown = "top 0s, left 0s";
+
 function MakeDraggable({
   onStart,
   onEnd,
@@ -55,24 +57,31 @@ function MakeDraggable({
     };
   }, [isDragged]); // eslint-disable-line
 
+  const transitions = style.transition
+    ? `${style.transition}, ${stopSlowDown}`
+    : stopSlowDown;
+
+  const dragStyles = isDragged
+    ? {
+        position: "fixed",
+        transition: transitions,
+        left: `${pos.x}px`,
+        top: `${pos.y}px`,
+      }
+    : {};
+
+  const styles = {
+    ...style,
+    ...dragStyles,
+    cursor: "grab",
+  };
+
   return (
     <div
       ref={divRef}
       onMouseDown={start}
       onMouseUp={end}
-      style={{
-        ...style,
-        cursor: "grab",
-        ...(isDragged
-          ? {
-              position: "fixed",
-              /* TODO: replace transition more carefully (regex) */
-              transition: "top 0s, left 0s",
-              left: `${pos.x}px`,
-              top: `${pos.y}px`,
-            }
-          : {}),
-      }}
+      style={styles}
       {...rest}
     >
       {children}
