@@ -1,9 +1,11 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import "./style.css";
 
-function Target() {
+const Target = forwardRef(({ style, ...rest }, ref) => {
   return (
     <div
+      ref={ref}
+      {...rest}
       className="target"
       style={{
         width: "120px",
@@ -11,11 +13,12 @@ function Target() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        ...style,
       }}
     >
       Grab me!
     </div>
   );
-}
+});
 
 export default Target;

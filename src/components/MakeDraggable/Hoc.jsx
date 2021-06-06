@@ -1,20 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./style.css";
 import mouseTracker from "./mouseTracker";
 
-function MakeDraggable({ children, style = {}, ...rest }) {
+function Hoc(Component) {
   const [xOffset, setXoffset] = useState(null);
   const [yOffset, setYoffset] = useState(null);
 
   const [isDragged, setIsDragged] = useState(false);
 
   const subIdRef = useRef(null);
+  const mainRef = useRef(null);
 
   const start = (event) => {
     const box = event.target.getBoundingClientRect();
     setYoffset(mouseTracker.getY() - box.y);
     setXoffset(mouseTracker.getX() - box.x);
     setIsDragged(true);
+
+    mainRef.current.style.transition = "top 0s, left 0s";
+    mainRef.current.style.position = "fixed";
   };
 
   useEffect(() => {
@@ -25,10 +29,13 @@ function MakeDraggable({ children, style = {}, ...rest }) {
     }
   }, [isDragged]); // eslint-disable-line
 
-  const mainRef = useRef(null);
-
   const end = () => {
     setIsDragged(false);
+
+    mainRef.current.style.transition = "";
+    mainRef.current.style.position = "";
+    mainRef.current.style.top = "";
+    mainRef.current.style.left = "";
   };
 
   const updateCoords = (x, y) => {
@@ -51,24 +58,21 @@ function MakeDraggable({ children, style = {}, ...rest }) {
     };
   }, []);
 
-  return (
-    <div
-      ref={mainRef}
-      onDragStart={(event) => event.preventDefault()}
-      className="makeDraggable"
-      onMouseDown={start}
-      style={{
-        ...style,
-        cursor: "grab",
-        ...(isDragged
-          ? { position: "fixed", transition: "top 0s, left 0s" }
-          : {}),
-      }}
-      {...rest}
-    >
-      {children}
-    </div>
+  return useCallback(
+    ({ style = {} }) => (
+      <Component
+        ref={mainRef}
+        onDragStart={(event) => event.preventDefault()}
+        onMouseDown={start}
+        style={{
+          ...style,
+          // position: "fixed",
+          cursor: "grab",
+        }}
+      />
+    ),
+    []
   );
 }
 
-export default MakeDraggable;
+export default Hoc;
