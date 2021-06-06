@@ -35,17 +35,16 @@ function MakeDraggable({
 
   const divRef = useRef(null);
 
-  const updateCoords = (x, y) => {
+  const move = (x, y) => {
     setPos({ x: x - xOffset, y: y - yOffset });
     onMove && onMove(divRef.current, x, y);
   };
 
-  useMouseTracker(isDragged, updateCoords);
+  useMouseTracker(isDragged, move);
 
   useEffect(() => {
     if (isDragged) {
       onStart && onStart(divRef.current, pos.x + xOffset, pos.y + yOffset);
-
       // must specify false so it doesn't trigger on first render
     } else if (isDragged === false) {
       onEnd && onEnd(divRef.current, pos.x + xOffset, pos.y + yOffset);
