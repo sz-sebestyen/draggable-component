@@ -1,43 +1,52 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./style.css";
+import mouseTracker from "./mouseTracker";
 
-function MakeDraggable({ children }) {
-  const [isDragged, setIsDragged] = useState(false);
-
-  const [x, setX] = useState(null);
-  const [y, setY] = useState(null);
+function MakeDraggable({ children, style = {} }) {
   const [xOffset, setXoffset] = useState(null);
   const [yOffset, setYoffset] = useState(null);
 
-  const [restX, setRestX] = useState(0);
-  const [restY, setRestY] = useState(0);
+  const [isDragged, setIsDragged] = useState(false);
+
+  const subIdRef = useRef(null);
 
   const start = (event) => {
     const box = event.target.getBoundingClientRect();
-    setYoffset(y - box.y);
-    setXoffset(x - box.x);
+    setYoffset(mouseTracker.getY() - box.y);
+    setXoffset(mouseTracker.getX() - box.x);
     setIsDragged(true);
   };
+
+  useEffect(() => {
+    if (isDragged) {
+      subIdRef.current = mouseTracker.subscibe(updateCoords);
+    } else {
+      mouseTracker.ussubscribe(subIdRef.current);
+    }
+  }, [isDragged]); // eslint-disable-line
 
   const mainRef = useRef(null);
 
   const end = () => {
-    const box = mainRef.current.getBoundingClientRect();
-    setRestX(box.x);
-    setRestY(box.y);
     setIsDragged(false);
   };
 
-  const updateCoords = (event) => {
-    setX(event.clientX);
-    setY(event.clientY);
+  const updateCoords = (x, y) => {
+    // TODO: prevent from leaving client
+
+    // const correctX = x - xOffset;
+    // const correctY = y - yOffset;
+
+    // const limitX = correctX < 0 ? 0 : correctX;
+
+    mainRef.current.style.left = `${x - xOffset}px`;
+    mainRef.current.style.top = `${y - yOffset}px`;
   };
 
   useEffect(() => {
-    window.addEventListener("mousemove", updateCoords);
     window.addEventListener("mouseup", end);
     return () => {
-      window.removeEventListener("mousemove", updateCoords);
+      mouseTracker.ussubscribe(subIdRef.current);
       window.removeEventListener("mouseup", end);
     };
   }, []);
@@ -48,15 +57,11 @@ function MakeDraggable({ children }) {
       onDragStart={(event) => event.preventDefault()}
       className="makeDraggable"
       onMouseDown={start}
-      style={
-        isDragged
-          ? {
-              position: "fixed",
-              top: `${y - yOffset}px`,
-              left: `${x - xOffset}px`,
-            }
-          : { position: "fixed", top: `${restY}`, left: `${restX}` }
-      }
+      style={{
+        ...style,
+        position: "fixed",
+        ...(isDragged ? { transition: "top 0s, left 0s" } : {}),
+      }}
     >
       {children}
     </div>
