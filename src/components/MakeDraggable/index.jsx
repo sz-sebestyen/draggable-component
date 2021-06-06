@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef } from "react";
 import "./style.css";
 import mouseTracker from "./mouseTracker";
 
-function MakeDraggable({ children, style = {}, ...rest }) {
+function MakeDraggable({ onStart, onEnd, children, style = {}, ...rest }) {
+  // TODO: onDragEnd and onDragStart props
+
   const [xOffset, setXoffset] = useState(null);
   const [yOffset, setYoffset] = useState(null);
 
@@ -39,8 +41,10 @@ function MakeDraggable({ children, style = {}, ...rest }) {
   useEffect(() => {
     if (isDragged) {
       subIdRef.current = mouseTracker.subscibe(updateCoords);
+      onStart && onStart();
     } else {
       mouseTracker.unsubscribe(subIdRef.current);
+      onEnd && onEnd();
     }
   }, [isDragged]); // eslint-disable-line
 
@@ -79,3 +83,10 @@ function MakeDraggable({ children, style = {}, ...rest }) {
 }
 
 export default MakeDraggable;
+
+export const WithDraggable = (WrappedComponent) => (props) =>
+  (
+    <MakeDraggable {...props}>
+      <WrappedComponent />
+    </MakeDraggable>
+  );
