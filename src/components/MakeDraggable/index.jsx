@@ -7,25 +7,20 @@ function MakeDraggable({ children, style = {}, ...rest }) {
   const [yOffset, setYoffset] = useState(null);
 
   const [isDragged, setIsDragged] = useState(false);
-
-  const subIdRef = useRef(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
 
   const start = (event) => {
     const box = event.target.getBoundingClientRect();
     setYoffset(mouseTracker.getY() - box.y);
     setXoffset(mouseTracker.getX() - box.x);
+
+    setPos({ x: `${box.x}px`, y: `${box.y}px` });
+    // console.log("setPos in start");
+
     setIsDragged(true);
   };
 
-  useEffect(() => {
-    if (isDragged) {
-      subIdRef.current = mouseTracker.subscibe(updateCoords);
-    } else {
-      mouseTracker.unsubscribe(subIdRef.current);
-    }
-  }, [isDragged]); // eslint-disable-line
-
-  const mainRef = useRef(null);
+  // const mainRef = useRef(null);
 
   const end = () => {
     setIsDragged(false);
@@ -39,29 +34,44 @@ function MakeDraggable({ children, style = {}, ...rest }) {
 
     // const limitX = correctX < 0 ? 0 : correctX;
 
-    mainRef.current.style.left = `${x - xOffset}px`;
-    mainRef.current.style.top = `${y - yOffset}px`;
+    setPos({ x: `${x - xOffset}px`, y: `${y - yOffset}px` });
   };
+
+  const subIdRef = useRef(null);
+
+  useEffect(() => {
+    if (isDragged) {
+      subIdRef.current = mouseTracker.subscibe(updateCoords);
+    } else {
+      mouseTracker.unsubscribe(subIdRef.current);
+    }
+  }, [isDragged]); // eslint-disable-line
 
   useEffect(() => {
     window.addEventListener("mouseup", end);
+
     return () => {
-      mouseTracker.ussubscribe(subIdRef.current);
+      mouseTracker.unsubscribe(subIdRef.current);
       window.removeEventListener("mouseup", end);
     };
   }, []);
 
   return (
     <div
-      ref={mainRef}
-      onDragStart={(event) => event.preventDefault()}
+      // ref={mainRef}
+      // onDragStart={(event) => event.preventDefault()}
       className="makeDraggable"
       onMouseDown={start}
       style={{
         ...style,
         cursor: "grab",
         ...(isDragged
-          ? { position: "fixed", transition: "top 0s, left 0s" }
+          ? {
+              position: "fixed",
+              transition: "top 0s, left 0s",
+              left: pos.x,
+              top: pos.y,
+            }
           : {}),
       }}
       {...rest}
