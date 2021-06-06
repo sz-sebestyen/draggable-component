@@ -1,8 +1,10 @@
 import React from "react";
+import "./style.css";
 
 function Target() {
   return (
     <div
+      className="target"
       style={{
         width: "120px",
         height: "120px",
